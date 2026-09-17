@@ -1,5 +1,5 @@
 ---
-status: "done"
+status: "shipped"
 current_state: "All three experiments complete (Qwen LoRA, ModernBERT, SetFit). Conclusion reached: the ceiling is the data, not the model. All architectures plateau at 40–60% on natural language. No further runs planned."
 next_action: "None. Experiment closed. Any future work needs a real product-support ticket corpus, not synthetic Bitext — out of scope for this kata."
 things_to_know:
@@ -11,8 +11,8 @@ read_next:
   - "README.md"
   - "EXPERIMENTS.md"
 safe_first_action: "Read README.md, then EXPERIMENTS.md for the comparison table and conclusion."
-updated_at: "2026-06-30"
-updated_by: "claude"
+updated_at: "2026-08-12"
+updated_by: "codex"
 ---
 
 ## Build inbox

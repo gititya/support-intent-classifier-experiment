@@ -54,20 +54,20 @@ Eval script: `scripts/eval_compare.py` — runs synthetic val (144 examples) and
 
 **ModernBERT v1 (50% natural):** Collapses billing and delivery onto `bug_report` for keyword-free messages. "Monthly statement numbers don't add up" → bug_report. "Order supposed to arrive Monday" → bug_report. High confidence on wrong answers (0.81, 0.95).
 
-**ModernBERT v2 (40% natural):** More data made it worse on natural language — v2 trained harder on template patterns. "Cancellation without the word cancel" → account_access (0.97 confidence, dead wrong).
+**ModernBERT v2 (40% natural):** The v2 run scored lower than v1 on the same ten messages. "Cancellation without the word cancel" → account_access (0.97 confidence, dead wrong).
 
 **SetFit v1 full (50% natural):** Cancellation failure ("I don't want to keep paying") → other. Refund failure ("sent item back two weeks ago") → delivery. Billing failure ("monthly statement") → other. Different failure modes than ModernBERT, but same overall count.
 
-**SetFit 16-shot (20% natural):** Collapses most non-obvious inputs onto `bug_report` or `other`. 100% of predictions below the 0.8 confidence threshold — the model knows it's uncertain. This is actually the most useful signal: 16 examples/class is not enough for this label space.
+**SetFit 16-shot (20% natural):** Most non-obvious inputs were assigned to `bug_report` or `other`. All ten predictions were below the 0.8 confidence threshold in this run. This small result does not validate a confidence rule or establish a minimum number of examples per class.
 
-**SetFit v2 full (50% natural):** Best confidence calibration (only 30% below 0.8). Still fails on the same hard cases: keyword-free cancellation, implicit billing/refund.
+**SetFit v2 full (50% natural):** Three of the ten predictions were below the 0.8 confidence threshold. It still fails on the same hard cases: keyword-free cancellation, implicit billing/refund.
 
 ---
 
 ## Conclusion
 
-**SetFit did not close the natural-language gap.** All models plateau at 40–50% natural accuracy vs Qwen's 60% (with a label hint). The hypothesis that contrastive training would resist keyword-memorization did not hold at this data scale — SetFit v2 full matches Qwen's natural score but with worse macro-F1 (0.333 vs unknown), and without Qwen's structural inference advantage.
+**The saved runs show a gap between synthetic validation and ordinary customer wording.** The natural-language development check ranged from 20% to 60% across the six variants, while synthetic validation ranged from 89.6% to 99.3%. The ten natural messages were reused during development, so these results are directional and not a final held-out estimate.
 
-**More data made things worse, not better.** Both ModernBERT v1→v2 (50%→40%) and all models trained on Bitext augmentation show the same or wider synthetic→natural gaps with more training data. The augmented examples (Haiku paraphrases) didn't add natural-language diversity — they added more template-shaped variation that the models overfit to.
+**Changing model family did not remove the observed failures.** ModernBERT v1→v2 moved from 50% to 40% on the same ten messages, while SetFit variants ranged from 20% to 50%. These comparisons describe this data and these runs; they do not identify whether data, labels, prompts, or architecture was the main cause.
 
-**The ceiling is the data, not the model architecture.** Qwen (1.5B decoder), ModernBERT (149M encoder), and SetFit (all-MiniLM-L6-v2 + logistic regression) all converge to the same natural accuracy band. The 8-class label space has genuine ambiguity (billing vs bug_report, cancellation vs account_access) that synthetic Bitext data cannot teach because it never contains keyword-free, naturally-ambiguous examples. Closing the gap requires either a fundamentally different data source or a more precise label taxonomy.
+**The portfolio lesson is bounded:** validation examples that share template patterns can overstate readiness for ordinary customer language. Stop the experiment here. Any future work would need a separately designed, held-out support corpus and label review rather than more runs on these reused messages.

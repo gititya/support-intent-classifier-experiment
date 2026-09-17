@@ -1,17 +1,16 @@
 ---
-status: "shipped"
-current_state: "All three experiments complete (Qwen LoRA, ModernBERT, SetFit). Conclusion reached: the ceiling is the data, not the model. All architectures plateau at 40–60% on natural language. No further runs planned."
-next_action: "None. Experiment closed. Any future work needs a real product-support ticket corpus, not synthetic Bitext — out of scope for this kata."
+status: "paused"
+current_state: "The completed small intent experiment shows a gap between its training data and the selected natural-language examples. It does not establish a general model ceiling."
+next_action: "Review the existing README before publication or separate app integration."
 things_to_know:
-  - "EXPERIMENTS.md holds the full comparison table and conclusion; README.md is the public writeup."
-  - "SetFit did not close the natural-language gap; more augmented data made it worse, not better."
-  - "CFPB complaints (signal repo) were evaluated as a real-language source and rejected — wrong domain/taxonomy."
+  - "The revised README is the current scope and evidence statement."
+  - "Changes are saved locally; publication remains a separate approval."
 what_it_is: "Completed intent-classifier learning experiment: synthetic→natural generalization gap measured across a decoder LLM, an encoder, and a contrastive few-shot method."
 read_next:
   - "README.md"
   - "EXPERIMENTS.md"
 safe_first_action: "Read README.md, then EXPERIMENTS.md for the comparison table and conclusion."
-updated_at: "2026-08-12"
+updated_at: "2026-09-17"
 updated_by: "codex"
 ---
 

@@ -1,26 +1,32 @@
 # [EXPERIMENT] Intent Classifier
 
-I wanted to test a basic support use case with LLMs: can a small model put a customer’s message into the right support category, even when customers do not use obvious keywords?
+I wanted to test a basic support use case with LLMs:
+'Can a small model put a customer’s message into the right support category, even when customers do not use obvious keywords?'
 
-I hand-wrote 10 customer requests in ordinary language. Across the saved runs, the models got between 2 and 6 of them right.
+I hand-wrote 10 customer requests in ordinary, day-day language. Across the saved runs, the models got between 2 and 6 of them right.
 I used the same messages while changing the training data, prompts and model choices. Those results are part of this experiment, not a test on a fresh set of customer requests.
 
 Fine-tuned `Qwen2.5-1.5B-Instruct` to classify customer support messages into 8 labels: `billing`, `account_access`, `refund`, `product_how_to`, `bug_report`, `cancellation`, `delivery`, `other`.
 
 ## The process
+
 1. **Data prep**:  Used 26K Bitext rows (from Hugging Face), mapped 27 intents to 8 labels, capped at 100 per label to balance, then produced 576 training and 144 validation examples.
 2. **LoRA config**: Rank 8, alpha 16, lr 1e-4, batch 4, 720 iters (~5 passes through the data).
 3. **Training** : `mlx-lm` on M3 MacBook Air 16GB. It ran for ~20 mins with peak memory: ~2GB & Loss gradually improved from: 1.28 → 0.15.
 4. **Eval** : 99.3% on 144 synthetic validation examples. The one miss was an `other` message predicted as `account_access`.
 5. **Baseline** : The same 144-example evaluation on the untouched base model scored 50.7%. The fine-tuned run scored 99.3% on that validation set. This comparison measures output accuracy on the supplied labels; it does not show why the scores differed.
 
+Five of the 144 validation examples also appeared in training. That overlap is another reason not to treat the validation score as proof of performance on new customer requests.
+
 **Then the check on ten hand-written customer requests scored 60%.**
+
 ## TL;DR
+
 1. The fine-tuned model hit 99.3% accuracy on 144 synthetic validation examples.
 2. On ten ordinary messages without the Bitext template patterns, the same run scored 60%.
 3. The test included failures such as "I don't want to keep paying for this" → `other`.
 
-That was the useful lesson: doing well on tidy, familiar examples did not mean the classifier could handle ordinary customer wording. I reused the same ten messages for the later checks, so I am keeping the conclusion limited to the failures I actually saw.
+That was the useful lesson --> doing well on tidy, familiar examples did not mean the classifier could handle ordinary customer wording. I reused the same ten messages for the later checks, so I am keeping the conclusion limited to the failures I actually saw.
 
 ## The augmentation round
 
@@ -28,7 +34,7 @@ Used Claude Haiku to paraphrase every training example without the obvious keywo
 
 Result: still 60% on the same ten reused messages, but with different failures.
 
-**Fixed:** `cancellation` ✓ — paraphrases without "cancel" worked. `other` ✓ — diverse generation worked.
+**Correct after retraining:** the previously missed `cancellation` and `other` messages in this ten-message check. This does not establish that either category was fixed generally.
 
 **New failures:** `billing` and two `account_access` messages all predicted as `bug_report`. The saved comparison shows a different error pattern after augmentation; it does not establish why the class boundary changed.
 
